@@ -56,8 +56,9 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation ("androidx.compose.material:material:1.4.0") // для Material3 компонентов
+    implementation ("androidx.compose.material:material:1.7.5")
     implementation ("androidx.compose.ui:ui:1.7.5") // для основного UI компонента
     implementation ("androidx.compose.material:material-icons-extended:1.7.5") // для иконок
     implementation("androidx.navigation:navigation-compose:2.4.0-alpha09")
+    implementation ("androidx.compose.material3:material3:1.3.1")
 }

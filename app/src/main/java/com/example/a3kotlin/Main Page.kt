@@ -3,6 +3,7 @@ package com.example.a3kotlin
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -13,9 +14,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
@@ -34,7 +38,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -44,7 +47,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.*
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.BottomNavigation
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
@@ -53,7 +58,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-
+import androidx.compose.material3.*
+import androidx.compose.ui.layout.ContentScale
 
 @Composable
 fun Content(modifier: Modifier = Modifier) {
@@ -76,7 +82,7 @@ fun ProductCard(product: Product) {
     val cardColor = colorResource(id = R.color.card_color)
     val textColor = colorResource(id = R.color.black)
     val buttonColor = colorResource(id = R.color.lil_button_or_add_pay_address)
-        Card(
+    Card(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
@@ -89,7 +95,7 @@ fun ProductCard(product: Product) {
         ) {
 
             Image(
-                painter = painterResource(id = product.imageRes), // Используем ресурс изображения
+                painter = painterResource(id = product.imageRes),
                 contentDescription = product.name,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -122,7 +128,7 @@ fun ProductCard(product: Product) {
 
             // Кнопка "В корзину"
             Button(
-                onClick = {},
+                onClick = { CartViewModel.addProduct(product) },
                 modifier = Modifier
                     .fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
@@ -155,7 +161,7 @@ fun TopBar() {
                 horizontalArrangement = Arrangement.Start,
                 modifier = Modifier.fillMaxWidth()
             ) {
- 
+
                 Image(
                     painter = painterResource(id = R.drawable.logo), // Логотип
                     contentDescription = "Logo",
@@ -194,7 +200,8 @@ fun MainScreen() {
     Scaffold(
         topBar = { TopBar() },
         bottomBar = { BottomNavigationBar(navController) }
-    ) { paddingValues ->
+    ) {
+        paddingValues ->
         Content(modifier = Modifier.fillMaxSize().padding(paddingValues))
     }
 }
@@ -205,26 +212,28 @@ fun Navigation(navController: NavHostController){
     NavHost(navController, startDestination = NavigationItems.Home.route){
 
         composable(NavigationItems.Home.route){
-            TODO("HomeScreen()")
+            MainScreen()
         }
 
         composable(NavigationItems.Catalog.route){
-            TODO("CatalogScreen()")
+            MainScreen()
         }
 
         composable(NavigationItems.ShoppingCard.route){
-            TODO("ShoppingCardScreen()")
+            MainScreen()
         }
         composable(NavigationItems.Lovely.route){
-            TODO("LovelyScreen()")
+            MainScreen()
         }
 
     }
 
 }
 
+
 @Composable
 fun BottomNavigationBar(navController: NavController) {
+    val cartItemCount = CartViewModel.getTotalItems()
 
     val items = listOf(
         NavigationItems.Home,
@@ -233,13 +242,19 @@ fun BottomNavigationBar(navController: NavController) {
         NavigationItems.Lovely
     )
 
-
     val itemColor = colorResource(id = R.color.white)
-
+    val backgroundColor = colorResource(id = R.color.top_down_color)
+    val accentColor = colorResource(id = R.color.lil_button_or_add_pay_address)
+    
     BottomNavigation(
-        backgroundColor = colorResource(id = R.color.top_down_color),
+        backgroundColor = backgroundColor,
         contentColor = itemColor,
-        modifier = Modifier.height(72.dp)
+        modifier = Modifier
+            .height(64.dp)
+            .background(
+                color = backgroundColor,
+                shape = MaterialTheme.shapes.medium
+            )
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -247,24 +262,63 @@ fun BottomNavigationBar(navController: NavController) {
         items.forEach { item ->
             BottomNavigationItem(
                 icon = {
-                    Icon(
-                        painter = painterResource(id = item.icon),
-                        contentDescription = item.title,
-                        tint = itemColor
+                    if (item.route == NavigationItems.ShoppingCard.route && cartItemCount != 0) {
+                        BadgedBox(
+                            modifier = Modifier.wrapContentSize(),
+                            badge = {
+                                Surface(
+                                    modifier = Modifier
+                                        .padding(top = 4.dp)
+                                        .widthIn(min = 16.dp), // Минимальная ширина
+                                    shape = CircleShape,
+                                    color = accentColor,
+                                    tonalElevation = 4.dp
+                                ) {
+                                    Text(
+                                        text = if (cartItemCount > 99) "99+" else cartItemCount.toString(),
+                                        color = backgroundColor,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                                        textAlign = TextAlign.Center,
+                                        maxLines = 1
+                                    )
+                                }
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(id = item.icon),
+                                contentDescription = item.title,
+                                modifier = Modifier.size(24.dp),
+                                tint = if (currentRoute == item.route) accentColor else itemColor
+                            )
+                        }
+                    } else {
+                        Icon(
+                            painter = painterResource(id = item.icon),
+                            contentDescription = item.title,
+                            modifier = Modifier.size(24.dp),
+                            tint = if (currentRoute == item.route) accentColor else itemColor
+                        )
+                    }
+                },
+                label = {
+                    Text(
+                        text = item.title,
+                        style = MaterialTheme.typography.labelSmall,
+                        maxLines = 1,
+                        color = itemColor
                     )
                 },
-                selectedContentColor = itemColor,
+                selectedContentColor = accentColor,
                 unselectedContentColor = itemColor,
                 alwaysShowLabel = true,
                 selected = currentRoute == item.route,
                 onClick = {
-                    navController.navigate(item.route) {
-                        navController.graph.startDestinationRoute?.let { route ->
-                            popUpTo(route = route) {
-                                saveState = true
-                            }
+                    // Всегда переходим на MainScreen
+                    navController.navigate(NavigationItems.Home.route) {
+                        popUpTo(NavigationItems.Home.route) { 
+                            saveState = true 
                         }
-
                         launchSingleTop = true
                         restoreState = true
                     }
@@ -273,4 +327,3 @@ fun BottomNavigationBar(navController: NavController) {
         }
     }
 }
-

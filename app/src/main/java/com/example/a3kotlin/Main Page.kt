@@ -1,5 +1,6 @@
 package com.example.a3kotlin
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +21,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
@@ -49,7 +51,10 @@ import androidx.compose.material3.*
 import androidx.compose.material.BottomNavigation
 //noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.draw.clip
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -57,38 +62,48 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.layout.ContentScale
-
-
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 
 @Composable
-fun ProductCard(product: Product) {
+fun ProductCard(product: Product, favoritesViewModel: FavoritesViewModel = viewModel()) {
     val cardColor = colorResource(id = R.color.card_color)
     val textColor = colorResource(id = R.color.black)
     val buttonColor = colorResource(id = R.color.lil_button_or_add_pay_address)
-    Card(
+
+    val favoriteProducts = favoritesViewModel.getProducts()
+    val isFavorite = favoriteProducts.any { it.id == product.id }
+
+
+    val configuration = LocalConfiguration.current
+    val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+
+    Box(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
             .background(cardColor)
-        ,
-        shape = MaterialTheme.shapes.medium
     ) {
+        // Контент карточки
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
 
+            // Изображение продукта
             Image(
                 painter = painterResource(id = product.imageRes),
                 contentDescription = product.name,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp),
+                    .height(if (isPortrait) 150.dp else 100.dp) // Адаптируем высоту в зависимости от ориентации
+                    .clip(RoundedCornerShape(8.dp)), // Округляем края изображения
                 contentScale = ContentScale.Crop
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Название продукта
             Text(
                 color = textColor,
                 text = product.name,
@@ -116,27 +131,42 @@ fun ProductCard(product: Product) {
                 modifier = Modifier
                     .fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = buttonColor // Задаем цвет фона кнопки
+                    containerColor = buttonColor
                 )
             ) {
                 Text(
                     text = "В корзину",
-                    color = textColor, // Цвет текста на кнопке
+                    color = textColor,
                     style = TextStyle(fontSize = 18.sp),
-                    maxLines = 1, // Убедимся, что текст не выходит за пределы кнопки
-                    overflow = TextOverflow.Ellipsis, // Текст не будет выходить за пределы
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center
                 )
             }
         }
-    }
-}
 
-@Preview
-@Composable
-fun ProductView(){
-    val products = CartViewModel.getProducts()
-    ProductCard(products[0])
+        // Кнопка "Избранное" в правом верхнем углу
+        IconButton(
+            onClick = {
+                if (isFavorite) {
+                    favoritesViewModel.removeProduct(product)
+                } else {
+                    favoritesViewModel.addProduct(product)
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(8.dp)
+                .size(if (isPortrait) 30.dp else 40.dp) // Увеличиваем размер кнопки в горизонтальной ориентации
+                .clip(CircleShape) // Округляем кнопку
+        ) {
+            Icon(
+                imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                contentDescription = "Add to favorites",
+                tint = if (isFavorite) Color.Red else Color.Gray
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -191,9 +221,12 @@ fun MainScreen() {
 @Composable
 fun Content(modifier: Modifier = Modifier) {
     val products = MockData.getMockedProducts()
+    val configuration = LocalConfiguration.current
+    val columns = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 3 else 2
+
     Column(modifier = modifier) {
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+            columns = GridCells.Fixed(columns),
             contentPadding = PaddingValues(16.dp),
             modifier = Modifier.fillMaxSize()
         ) {

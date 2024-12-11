@@ -33,8 +33,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -58,24 +56,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.material3.*
 import androidx.compose.ui.layout.ContentScale
 
-@Composable
-fun Content(modifier: Modifier = Modifier) {
-    val products = MockData.getMockedProducts()
-    Column(modifier = modifier) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(16.dp),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(products) { product ->
-                ProductCard(product = product)
-            }
-        }
-    }
-}
+
+
 
 @Composable
 fun ProductCard(product: Product) {
@@ -148,6 +132,13 @@ fun ProductCard(product: Product) {
     }
 }
 
+@Preview
+@Composable
+fun ProductView(){
+    val products = CartViewModel.getProducts()
+    ProductCard(products[0])
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar() {
@@ -194,15 +185,71 @@ fun TopBar() {
 
 @Composable
 fun MainScreen() {
+    Content(modifier = Modifier)
+}
 
+@Composable
+fun Content(modifier: Modifier = Modifier) {
+    val products = MockData.getMockedProducts()
+    Column(modifier = modifier) {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(16.dp),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(products) { product ->
+                ProductCard(product = product)
+            }
+        }
+    }
+}
+
+@Composable
+fun MainPage() {
     val navController = rememberNavController()
-
     Scaffold(
         topBar = { TopBar() },
         bottomBar = { BottomNavigationBar(navController) }
+    ) { paddingValues ->
+        Box(modifier = Modifier.padding(paddingValues)) {
+            Navigation(navController)
+        }
+    }
+}
+
+@Composable
+fun CatalogScreen() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
-        paddingValues ->
-        Content(modifier = Modifier.fillMaxSize().padding(paddingValues))
+        Text(
+            text = "CATALOG SCREEN"
+        )
+    }
+}
+
+@Composable
+fun FavoritesScreen(){
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "FAVORITES"
+        )
+    }
+}
+
+@Composable
+fun ShoppingCardScreen(){
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Shopping"
+        )
     }
 }
 
@@ -216,20 +263,18 @@ fun Navigation(navController: NavHostController){
         }
 
         composable(NavigationItems.Catalog.route){
-            MainScreen()
+            CatalogScreen()
         }
 
         composable(NavigationItems.ShoppingCard.route){
-            MainScreen()
+            ShoppingCardScreen()
         }
-        composable(NavigationItems.Lovely.route){
-            MainScreen()
+        composable(NavigationItems.Favorites.route){
+            FavoritesScreen()
         }
 
     }
-
 }
-
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
@@ -239,7 +284,7 @@ fun BottomNavigationBar(navController: NavController) {
         NavigationItems.Home,
         NavigationItems.Catalog,
         NavigationItems.ShoppingCard,
-        NavigationItems.Lovely
+        NavigationItems.Favorites
     )
 
     val itemColor = colorResource(id = R.color.white)
@@ -269,7 +314,7 @@ fun BottomNavigationBar(navController: NavController) {
                                 Surface(
                                     modifier = Modifier
                                         .padding(top = 4.dp)
-                                        .widthIn(min = 16.dp), // Минимальная ширина
+                                        .widthIn(min = 16.dp),
                                     shape = CircleShape,
                                     color = accentColor,
                                     tonalElevation = 4.dp
@@ -314,10 +359,11 @@ fun BottomNavigationBar(navController: NavController) {
                 alwaysShowLabel = true,
                 selected = currentRoute == item.route,
                 onClick = {
-                    // Всегда переходим на MainScreen
-                    navController.navigate(NavigationItems.Home.route) {
-                        popUpTo(NavigationItems.Home.route) { 
-                            saveState = true 
+                    navController.navigate(item.route) {
+                        navController.graph.startDestinationRoute?.let { route ->
+                            popUpTo(route = route) {
+                                saveState = true
+                            }
                         }
                         launchSingleTop = true
                         restoreState = true

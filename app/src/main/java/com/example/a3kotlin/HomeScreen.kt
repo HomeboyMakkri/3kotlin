@@ -11,28 +11,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun MainScreen() {
-    Content(modifier = Modifier)
-}
-
-@Composable
-fun Content(modifier: Modifier = Modifier) {
+fun HomeScreen(navController: NavHostController) {
     val products = MockData.getMockedProducts()
-
     val configuration = LocalConfiguration.current
     val columns = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 3 else 2
 
-    Column(modifier = modifier) {
+    Column() {
         LazyVerticalGrid(
             columns = GridCells.Fixed(columns), // Устанавливаем количество столбцов в зависимости от ориентации
             contentPadding = PaddingValues(16.dp),
             modifier = Modifier.fillMaxSize()
         ) {
             items(products) { product ->
-                ProductCard(product = product)
+                ProductCard(product = product, navController = navController)
             }
         }
     }
 }
+

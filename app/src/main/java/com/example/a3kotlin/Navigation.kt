@@ -25,159 +25,53 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
 
 @Composable
-fun Navigation(navController: NavHostController){
+fun Navigation(navController: NavHostController) {
 
-    NavHost(navController, startDestination = NavigationItems.Home.route){
+    NavHost(navController, startDestination = NavigationItems.Home.route) {
 
-        composable(NavigationItems.Home.route){
-            MainScreen()
+        composable(NavigationItems.Home.route) {
+            HomeScreen(navController)
         }
 
-        composable(NavigationItems.Catalog.route){
-            CatalogScreen()
+        composable(NavigationItems.Catalog.route) {
+            CatalogScreen(navController)
         }
 
-        composable(NavigationItems.ShoppingCard.route){
-            ShoppingCardScreen()
+        composable(NavigationItems.ShoppingCard.route) {
+            ShoppingCardScreen(navController)
         }
-        composable(NavigationItems.Favorites.route){
-            FavoritesScreen()
+        composable(NavigationItems.Favorites.route) {
+            FavoritesScreen(navController)
         }
+        composable(
+            "productDetail/{productId}",
+            arguments = listOf(navArgument("productId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val productId = backStackEntry.arguments?.getString("productId") ?: ""
+            val product = MockData.productList.firstOrNull { it.id == productId }
 
+            if (product != null) {
+                // Передаем в экран ProductDetailScreen не только product, но и navController и cartViewModel
+                ProductDetailScreen(
+                    product = product,
+                    navController = navController
+                )
+            } else {
+                Text("Product not found")
+            }
+        }
     }
 }
 
-@Composable
-fun BottomNavigationBar(navController: NavController) {
-    val cartItemCount = CartViewModel.getTotalItems()
-    val favItemCount = FavoritesViewModel.getTotalItems()
 
-    val items = listOf(
-        NavigationItems.Home,
-        NavigationItems.Catalog,
-        NavigationItems.ShoppingCard,
-        NavigationItems.Favorites
-    )
 
-    val itemColor = colorResource(id = R.color.white)
-    val backgroundColor = colorResource(id = R.color.top_down_color)
-    val accentColor = colorResource(id = R.color.lil_button_or_add_pay_address)
-
-    BottomNavigation(
-        backgroundColor = backgroundColor,
-        contentColor = itemColor,
-        modifier = Modifier
-            .height(64.dp)
-            .background(
-                color = backgroundColor,
-                shape = MaterialTheme.shapes.medium
-            )
-    ) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
-
-        items.forEach { item ->
-            BottomNavigationItem(
-                icon = {
-                    if (item.route == NavigationItems.Favorites.route && favItemCount != 0) {
-                        BadgedBox(
-                            modifier = Modifier.wrapContentSize(),
-                            badge = {
-                                Surface(
-                                    modifier = Modifier
-                                        .padding(top = 4.dp)
-                                        .widthIn(min = 16.dp),
-                                    shape = CircleShape,
-                                    color = accentColor,
-                                    tonalElevation = 4.dp
-                                ) {
-                                    Text(
-                                        text = if (favItemCount > 99) "99+" else favItemCount.toString(),
-                                        color = backgroundColor,
-                                        style = MaterialTheme.typography.labelSmall,
-                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
-                                        textAlign = TextAlign.Center,
-                                        maxLines = 1
-                                    )
-                                }
-                            }
-                        ) {
-                            Icon(
-                                painter = painterResource(id = item.icon),
-                                contentDescription = item.title,
-                                modifier = Modifier.size(24.dp),
-                                tint = if (currentRoute == item.route) accentColor else itemColor
-                            )
-                        }
-                    }
-                    if (item.route == NavigationItems.ShoppingCard.route && cartItemCount != 0) {
-                        BadgedBox(
-                            modifier = Modifier.wrapContentSize(),
-                            badge = {
-                                Surface(
-                                    modifier = Modifier
-                                        .padding(top = 4.dp)
-                                        .widthIn(min = 16.dp),
-                                    shape = CircleShape,
-                                    color = accentColor,
-                                    tonalElevation = 4.dp
-                                ) {
-                                    Text(
-                                        text = if (cartItemCount > 99) "99+" else cartItemCount.toString(),
-                                        color = backgroundColor,
-                                        style = MaterialTheme.typography.labelSmall,
-                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
-                                        textAlign = TextAlign.Center,
-                                        maxLines = 1
-                                    )
-                                }
-                            }
-                        ) {
-                            Icon(
-                                painter = painterResource(id = item.icon),
-                                contentDescription = item.title,
-                                modifier = Modifier.size(24.dp),
-                                tint = if (currentRoute == item.route) accentColor else itemColor
-                            )
-                        }
-                    } else {
-                        Icon(
-                            painter = painterResource(id = item.icon),
-                            contentDescription = item.title,
-                            modifier = Modifier.size(24.dp),
-                            tint = if (currentRoute == item.route) accentColor else itemColor
-                        )
-                    }
-                },
-                label = {
-                    Text(
-                        text = item.title,
-                        style = MaterialTheme.typography.labelSmall,
-                        maxLines = 1,
-                        color = itemColor
-                    )
-                },
-                selectedContentColor = accentColor,
-                unselectedContentColor = itemColor,
-                alwaysShowLabel = true,
-                selected = currentRoute == item.route,
-                onClick = {
-                    navController.navigate(item.route) {
-                        navController.graph.startDestinationRoute?.let { route ->
-                            popUpTo(route = route) {
-                                saveState = true
-                            }
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
-            )
-        }
-    }
-}
+//fun currentRoute(navController: NavController): String? {
+//    return navController.currentBackStackEntry?.destination?.route
+//}

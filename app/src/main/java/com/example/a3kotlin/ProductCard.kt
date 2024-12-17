@@ -3,6 +3,7 @@ package com.example.a3kotlin
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,9 +37,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
-fun ProductCard(product: Product, favoritesViewModel: FavoritesViewModel = viewModel()) {
+fun ProductCard(
+    product: Product,
+    favoritesViewModel: FavoritesViewModel = viewModel(),
+    navController: NavController
+) {
+
     val cardColor = colorResource(id = R.color.card_color)
     val textColor = colorResource(id = R.color.black)
     val buttonColor = colorResource(id = R.color.lil_button_or_add_pay_address)
@@ -45,15 +54,19 @@ fun ProductCard(product: Product, favoritesViewModel: FavoritesViewModel = viewM
     val favoriteProducts = favoritesViewModel.getProducts()
     val isFavorite = favoriteProducts.any { it.id == product.id }
 
-
     val configuration = LocalConfiguration.current
     val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+
+
 
     Box(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
             .background(cardColor)
+            .clickable {
+                navController.navigate("productDetail/${product.id}")
+            }
     ) {
 
         Column(

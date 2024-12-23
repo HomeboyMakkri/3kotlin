@@ -69,9 +69,3 @@ fun Navigation(navController: NavHostController) {
         }
     }
 }
-
-
-
-//fun currentRoute(navController: NavController): String? {
-//    return navController.currentBackStackEntry?.destination?.route
-//}

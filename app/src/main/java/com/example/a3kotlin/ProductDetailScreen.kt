@@ -56,19 +56,14 @@ fun ProductDetailScreen(
     val buttonColor = if (buttonClicked) buttonSecond else buttonFirst
     val buttonText = if (buttonClicked) "Перейти к заказу" else "В корзину"
 
-    Box(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxSize()
-            .background(cardColor)
+
+    LazyColumn(
+        modifier = Modifier.padding(16.dp)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
-        Column(
-            modifier = Modifier.padding(16.dp)
-                .fillMaxSize()
-        ) {
-
-
+        item {
             Image(
                 painter = painterResource(id = product.imageRes),
                 contentDescription = product.name,
@@ -79,8 +74,8 @@ fun ProductDetailScreen(
                 contentScale = ContentScale.Crop
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
-
+        }
+        item {
             Text(
                 color = textColor,
                 text = product.name,
@@ -91,8 +86,8 @@ fun ProductDetailScreen(
                 style = TextStyle(fontSize = 16.sp)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
+        }
+        item {
             Text(
                 text = "${product.price} ₽",
                 modifier = Modifier.fillMaxWidth(),
@@ -100,19 +95,13 @@ fun ProductDetailScreen(
                 style = TextStyle(fontSize = 20.sp),
                 color = textColor
             )
+        }
 
-            LazyColumn(
-                modifier = Modifier
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(product.features) { string ->
-                    StringListItem(text = string)
-                }
-            }
+        items(product.features) { string ->
+            StringListItem(text = string)
+        }
 
-
-
+        item {
             Button(
                 onClick = {
                     if (buttonClicked) {
@@ -138,7 +127,8 @@ fun ProductDetailScreen(
                     style = TextStyle(fontSize = 20.sp),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    color = cardColor
                 )
             }
         }

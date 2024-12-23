@@ -39,24 +39,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
 import androidx.compose.ui.graphics.Color
 
+//@Composable
+//fun PaymentScreenWithAddCard() {
+//
+//
+//        PaymentScreen(
+//            paymentMethods = paymentMethods,
+//            selectedOption = selectedOption,
+//            isDropdownVisible = isDropdownVisible
+//        )
+//    }
+
 @Composable
-fun PaymentScreenWithAddCard() {
+fun PaymentScreen(navController: NavHostController) {
+
     val paymentMethods = PaymentViewModel.getMethods()
     val selectedOption = remember { mutableStateOf<String?>(null) }
     val isDropdownVisible = remember { mutableStateOf(false) }
-
-        PaymentScreen(
-            paymentMethods = paymentMethods,
-            selectedOption = selectedOption,
-            isDropdownVisible = isDropdownVisible
-        )
-    }
-
-@Composable
-fun PaymentScreen( paymentMethods: List<String>,
-                   selectedOption: MutableState<String?>,
-                   isDropdownVisible: MutableState<Boolean>)
-                    {
 
     val isAddingCard = remember { mutableStateOf(false) }
     Column(
@@ -130,7 +129,7 @@ fun PaymentScreen( paymentMethods: List<String>,
                             }
                             else {
 
-                                item() {
+                                item {
                                     Box (contentAlignment = Alignment.Center){
                                         Text(text = "Сохранненые карты отсутствуют, добавьте новый способ оплаты",
                                             textAlign = TextAlign.Center,
@@ -140,7 +139,7 @@ fun PaymentScreen( paymentMethods: List<String>,
                                     Spacer(modifier = Modifier.height(16.dp))
                                 }
                             }
-                                item() {
+                                item {
                                 Button(
                                     onClick = {
                                         isAddingCard.value = true
@@ -152,6 +151,20 @@ fun PaymentScreen( paymentMethods: List<String>,
                                     colors = ButtonDefaults.buttonColors(colorResource(id = R.color.add_button))
                                 ) {
                                     Text(text = "Добавить новую карту")
+                                }
+                            }
+                            item {
+                                Button(
+                                    onClick = {
+                                        navController.navigate(NavigationItemsSec.Success.route) {
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = ButtonDefaults.buttonColors(colorResource(id = R.color.add_button))
+                                ) {
+                                    Text(text = "Оплатить!")
                                 }
                             }
                         }

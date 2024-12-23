@@ -67,5 +67,14 @@ fun Navigation(navController: NavHostController) {
                 Text("Product not found")
             }
         }
+        composable(NavigationItemsSec.Address.route){
+            AdressPickScreen(navController)
+        }
+        composable(NavigationItemsSec.Payment.route){
+            PaymentScreen(navController)
+        }
+        composable(NavigationItemsSec.Success.route){
+            Success(navController)
+        }
     }
 }

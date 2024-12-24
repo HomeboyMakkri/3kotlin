@@ -19,17 +19,17 @@ import androidx.compose.ui.Alignment
 
 @Composable
 fun HomeScreen(navController: NavHostController, viewModel: HomeViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
-
     val products by viewModel.products.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(products.isEmpty() && !isLoading) {
         viewModel.loadProducts()
     }
 
     val configuration = LocalConfiguration.current
     val columns = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 3 else 2
 
-    if (products.isEmpty()) {
+    if (isLoading) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
         }

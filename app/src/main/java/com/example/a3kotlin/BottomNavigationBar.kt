@@ -56,7 +56,6 @@ fun BottomNavigationBar(navController: NavController) {
 
         items.forEach { item ->
             BottomNavigationItem(
-                    // Для Favorites
                     icon = {
                         when (item.route) {
                             NavigationItems.Favorites.route -> {
@@ -148,7 +147,6 @@ fun BottomNavigationBar(navController: NavController) {
                             }
 
                             else -> {
-                                // Для всех остальных элементов
                                 Icon(
                                     painter = painterResource(id = item.icon),
                                     contentDescription = item.title,

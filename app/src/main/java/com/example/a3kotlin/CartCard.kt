@@ -10,23 +10,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
@@ -38,10 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
-fun ProductCard(
+fun CartCard(
     product: Product,
     favoritesViewModel: FavoritesViewModel = viewModel(),
     navController: NavController
@@ -107,7 +96,7 @@ fun ProductCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
-                onClick = { CartViewModel.addProduct(product) },
+                onClick = { CartViewModel.removeProduct(product) },
                 modifier = Modifier
                     .fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
@@ -115,7 +104,7 @@ fun ProductCard(
                 )
             ) {
                 Text(
-                    text = "В корзину",
+                    text = "Удалить",
                     color = textColor,
                     style = TextStyle(fontSize = 18.sp),
                     maxLines = 1,
@@ -123,27 +112,6 @@ fun ProductCard(
                     textAlign = TextAlign.Center
                 )
             }
-        }
-
-        IconButton(
-            onClick = {
-                if (isFavorite) {
-                    favoritesViewModel.removeProduct(product)
-                } else {
-                    favoritesViewModel.addProduct(product)
-                }
-            },
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(8.dp)
-                .size(if (isPortrait) 30.dp else 40.dp)
-                .clip(CircleShape)
-        ) {
-            Icon(
-                imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                contentDescription = "Add to favorites",
-                tint = if (isFavorite) Color.Red else Color.Gray
-            )
         }
     }
 }

@@ -63,7 +63,6 @@ fun AdressPickScreen(navController: NavHostController, adressViewModel: AdressVi
             Column(
                 modifier = Modifier.fillMaxWidth().padding(10.dp)
             ) {
-                // Первая кнопка
                 Button(
                     onClick = { adressViewModel.addAdress("Адрес ${adresses.size + 1}") },
                     modifier = Modifier.fillMaxWidth(),
@@ -72,9 +71,8 @@ fun AdressPickScreen(navController: NavHostController, adressViewModel: AdressVi
                     Text(text = "Добавить адрес", color = Color.Black)
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))  // Отступ между кнопками
+                Spacer(modifier = Modifier.height(10.dp))
 
-                // Вторая кнопка
                 Button(
                     onClick = {
                         navController.navigate(NavigationItemsSec.Payment.route) {

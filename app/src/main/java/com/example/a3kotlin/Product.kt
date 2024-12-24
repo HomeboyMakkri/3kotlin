@@ -7,7 +7,4 @@ data class Product(
     val description: String,
     val imageRes: Int,
     val features: List<String>) {
-//    fun getId(): Int {
-//        return id
-//    }
 }

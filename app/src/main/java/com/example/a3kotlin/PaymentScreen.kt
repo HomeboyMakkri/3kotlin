@@ -38,20 +38,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.viewmodel.compose.viewModel
 
-//@Composable
-//fun PaymentScreenWithAddCard() {
-//
-//
-//        PaymentScreen(
-//            paymentMethods = paymentMethods,
-//            selectedOption = selectedOption,
-//            isDropdownVisible = isDropdownVisible
-//        )
-//    }
 
 @Composable
-fun PaymentScreen(navController: NavHostController) {
+fun PaymentScreen(navController: NavHostController, favoritesViewModel: FavoritesViewModel = viewModel()) {
 
     val paymentMethods = PaymentViewModel.getMethods()
     val selectedOption = remember { mutableStateOf<String?>(null) }
@@ -156,6 +147,7 @@ fun PaymentScreen(navController: NavHostController) {
                             item {
                                 Button(
                                     onClick = {
+                                        CartViewModel.clear()
                                         navController.navigate(NavigationItemsSec.Success.route) {
                                             launchSingleTop = true
                                             restoreState = true

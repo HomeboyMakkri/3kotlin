@@ -37,13 +37,11 @@ fun Success(navController: NavHostController) {
             .background(backgroundColor),
         contentAlignment = Alignment.Center
     ) {
-        // Контейнер с текстом и кнопкой
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
             modifier = Modifier.padding(32.dp)
         ) {
-            // Текст благодарности
             Text(
                 text = "Спасибо за покупку!",
                 style = TextStyle(
@@ -55,7 +53,6 @@ fun Success(navController: NavHostController) {
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // Подтверждающий текст
             Text(
                 text = "Мы надеемся, что вам понравится!",
                 style = TextStyle(
@@ -67,7 +64,6 @@ fun Success(navController: NavHostController) {
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            // Кнопка для возврата на главный экран
             Button(
                 onClick = {
                     navController.navigate(NavigationItems.Home.route) {

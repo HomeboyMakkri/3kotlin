@@ -105,21 +105,19 @@ fun ProductDetailScreen(
             Button(
                 onClick = {
                     if (buttonClicked) {
-                        // Переход к экрану корзины
                         navController.navigate(NavigationItems.ShoppingCard.route) {
                             launchSingleTop = true
                             restoreState = true
                         }
                     } else {
-                        // Добавление товара в корзину и изменение состояния кнопки
                         CartViewModel.addProduct(product)
                         setButtonClicked(true)
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = buttonColor,  // Цвет фона кнопки
-                    contentColor = cardColor      // Цвет текста кнопки
+                    containerColor = buttonColor,
+                    contentColor = cardColor
                 )
             ) {
                 Text(
